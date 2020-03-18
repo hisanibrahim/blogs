@@ -11,15 +11,16 @@ import { Feather } from "@expo/vector-icons";
 import { Context as BlogContext } from "../context/BlogContext";
 
 const IndexScreen = ({ navigation }) => {
-  const { state, addBlogPost, deleteBlogPost } = useContext(BlogContext);
+  const { state, deleteBlogPost } = useContext(BlogContext);
   return (
     <View>
-      <Text>Hello, You are in index screen.</Text>
-      <Button title="Add blog post" onPress={addBlogPost}></Button>
       <FlatList
         data={state}
         keyExtractor={blogPost => blogPost.id.toString()}
         // key extractor expects string. converting id from number to string
+        ListEmptyComponent={() => (
+          <Text style={localStyles.info}>No blogs.</Text>
+        )}
         renderItem={({ item }) => {
           return (
             <TouchableOpacity
@@ -30,7 +31,7 @@ const IndexScreen = ({ navigation }) => {
                   {item.title} - {item.id}
                 </Text>
                 <TouchableOpacity onPress={() => deleteBlogPost(item.id)}>
-                  <Feather name="trash" style={localStyles.icon} />
+                  <Feather name="trash" size={24} />
                 </TouchableOpacity>
               </View>
             </TouchableOpacity>
@@ -39,6 +40,18 @@ const IndexScreen = ({ navigation }) => {
       />
     </View>
   );
+};
+
+IndexScreen.navigationOptions = ({ navigation }) => {
+  return {
+    headerRight: () => {
+      return (
+        <TouchableOpacity onPress={() => navigation.navigate("Create")}>
+          <Feather name="plus" size={30} style={localStyles.addIcon} />
+        </TouchableOpacity>
+      );
+    }
+  };
 };
 
 const localStyles = StyleSheet.create({
@@ -51,7 +64,8 @@ const localStyles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "gray"
   },
-  icon: { fontSize: 24 }
+  addIcon: { marginRight: 10 },
+  info: { textAlign: "center", marginTop: 5 }
 });
 
 export default IndexScreen;

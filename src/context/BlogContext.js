@@ -6,8 +6,9 @@ const blogReducer = (state, action) => {
       return [
         ...state,
         {
-          title: `Blog Post #${state.length + 1}`,
-          id: Math.floor(Math.random() * 123456789)
+          id: Math.floor(Math.random() * 123456789),
+          title: action.payload.title,
+          content: action.payload.content
         }
       ];
     case "delete_blogpost":
@@ -21,8 +22,10 @@ const blogReducer = (state, action) => {
 //createDataContext() bounds actions with dispatch so able to call dispatch from here
 
 const addBlogPost = dispatch => {
-  return () => {
-    dispatch({ type: "add_blogpost" });
+  return (title, content, callback) => {
+    // callback === function to execute after adding blog. eg: navigate to index page
+    dispatch({ type: "add_blogpost", payload: { title, content } });
+    callback();
   };
 };
 const deleteBlogPost = dispatch => {
