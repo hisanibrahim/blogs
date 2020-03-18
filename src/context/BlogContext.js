@@ -14,6 +14,12 @@ const blogReducer = (state, action) => {
     case "delete_blogpost":
       return state.filter(blogPost => blogPost.id !== action.payload);
     // array.filter iterates through each element and excludes element if callback return false
+
+    case "edit_blogpost":
+      return state.map(blogPost => {
+        return blogPost.id === action.payload.id ? action.payload : blogPost;
+        //The map() method creates a new array populated with the results of calling a provided function on every element in the calling array.
+      });
     default:
       state;
   }
@@ -33,9 +39,22 @@ const deleteBlogPost = dispatch => {
     dispatch({ type: "delete_blogpost", payload: id });
   };
 };
+const editBlogPost = dispatch => {
+  return (id, title, content, callback) => {
+    dispatch({ type: "edit_blogpost", payload: { id, title, content } });
+    callback();
+  };
+};
 
 export const { Context, Provider } = createDataContext(
   blogReducer,
-  { addBlogPost, deleteBlogPost },
-  []
+  { addBlogPost, deleteBlogPost, editBlogPost },
+  [
+    {
+      id: 1,
+      title: "TEST BLOG",
+      content:
+        "Understand React Native with Hooks, Context, and React Navigation."
+    }
+  ]
 );
