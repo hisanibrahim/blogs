@@ -10,7 +10,7 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { Context as BlogContext } from "../context/BlogContext";
 
-const IndexScreen = () => {
+const IndexScreen = ({ navigation }) => {
   const { state, addBlogPost, deleteBlogPost } = useContext(BlogContext);
   return (
     <View>
@@ -22,12 +22,18 @@ const IndexScreen = () => {
         // key extractor expects string. converting id from number to string
         renderItem={({ item }) => {
           return (
-            <View style={localStyles.item}>
-              <Text>{item.title}</Text>
-              <TouchableOpacity onPress={() => deleteBlogPost(item.id)}>
-                <Feather name="trash" style={localStyles.icon} />
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Show", { id: item.id })}
+            >
+              <View style={localStyles.item}>
+                <Text>
+                  {item.title} - {item.id}
+                </Text>
+                <TouchableOpacity onPress={() => deleteBlogPost(item.id)}>
+                  <Feather name="trash" style={localStyles.icon} />
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
           );
         }}
       />
