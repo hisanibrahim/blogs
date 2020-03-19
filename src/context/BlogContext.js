@@ -1,16 +1,10 @@
 import createDataContext from "./createDataContext";
+import jsonServer from "../api/jsonServer";
 
 const blogReducer = (state, action) => {
   switch (action.type) {
-    case "add_blogpost":
-      return [
-        ...state,
-        {
-          id: Math.floor(Math.random() * 123456789),
-          title: action.payload.title,
-          content: action.payload.content
-        }
-      ];
+    case "get_blogposts":
+      return action.payload;
     case "delete_blogpost":
       return state.filter(blogPost => blogPost.id !== action.payload);
     // array.filter iterates through each element and excludes element if callback return false
@@ -27,10 +21,19 @@ const blogReducer = (state, action) => {
 
 //createDataContext() bounds actions with dispatch so able to call dispatch from here
 
+const getBlogPosts = dispatch => {
+  return async () => {
+    const response = await jsonServer.get("/blogPosts");
+    // response.data === all blogposts from api === [ { } , { }]
+    dispatch({ type: "get_blogposts", payload: response.data });
+  };
+};
+
 const addBlogPost = dispatch => {
-  return (title, content, callback) => {
+  return async (title, content, callback) => {
     // callback === function to execute after adding blog. eg: navigate to index page
-    dispatch({ type: "add_blogpost", payload: { title, content } });
+
+    await jsonServer.post("blogposts/", { title, content });
     callback();
   };
 };
@@ -48,13 +51,6 @@ const editBlogPost = dispatch => {
 
 export const { Context, Provider } = createDataContext(
   blogReducer,
-  { addBlogPost, deleteBlogPost, editBlogPost },
-  [
-    {
-      id: 1,
-      title: "TEST BLOG",
-      content:
-        "Understand React Native with Hooks, Context, and React Navigation."
-    }
-  ]
+  { addBlogPost, deleteBlogPost, editBlogPost, getBlogPosts },
+  []
 );

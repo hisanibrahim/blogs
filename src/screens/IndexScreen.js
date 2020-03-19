@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,7 +11,22 @@ import { Feather } from "@expo/vector-icons";
 import { Context as BlogContext } from "../context/BlogContext";
 
 const IndexScreen = ({ navigation }) => {
-  const { state, deleteBlogPost } = useContext(BlogContext);
+  const { state, deleteBlogPost, getBlogPosts } = useContext(BlogContext);
+
+  useEffect(() => {
+    // useEffect used to invoke a method only once at initial render if 2nd arg === []
+    getBlogPosts();
+    const listener = navigation.addListener("didFocus", () => {
+      // add a listner to get blog posts from api when Index screen comes front
+      getBlogPosts();
+    });
+    return () => {
+      // this will execute when index screen destroying
+      // removing listener that time prevent memory leak
+      listener.remove();
+    };
+  }, []);
+
   return (
     <View>
       <FlatList
@@ -27,9 +42,7 @@ const IndexScreen = ({ navigation }) => {
               onPress={() => navigation.navigate("Show", { id: item.id })}
             >
               <View style={localStyles.item}>
-                <Text>
-                  {item.title} - {item.id}
-                </Text>
+                <Text>{item.title}</Text>
                 <TouchableOpacity onPress={() => deleteBlogPost(item.id)}>
                   <Feather name="trash" size={24} />
                 </TouchableOpacity>
