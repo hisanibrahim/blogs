@@ -33,17 +33,21 @@ const addBlogPost = dispatch => {
   return async (title, content, callback) => {
     // callback === function to execute after adding blog. eg: navigate to index page
 
-    await jsonServer.post("blogposts/", { title, content });
+    await jsonServer.post("/blogposts", { title, content });
+    // json-server automatically add id
+
     callback();
   };
 };
 const deleteBlogPost = dispatch => {
-  return id => {
+  return async id => {
+    await jsonServer.delete(`/blogposts/${id}`);
     dispatch({ type: "delete_blogpost", payload: id });
   };
 };
 const editBlogPost = dispatch => {
-  return (id, title, content, callback) => {
+  return async (id, title, content, callback) => {
+    await jsonServer.put(`/blogposts/${id}`, { title, content });
     dispatch({ type: "edit_blogpost", payload: { id, title, content } });
     callback();
   };
